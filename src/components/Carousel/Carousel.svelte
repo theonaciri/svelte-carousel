@@ -1,263 +1,273 @@
 <script>
-  import { onDestroy, onMount, tick, createEventDispatcher } from 'svelte'
-  import Dots from '../Dots/Dots.svelte'
-  import Arrow from '../Arrow/Arrow.svelte'
-  import Progress from '../Progress/Progress.svelte'
-  import { NEXT, PREV } from '../../direction'
-  import { swipeable } from '../../actions/swipeable'
-  import { hoverable } from '../../actions/hoverable'
-  import { tappable } from '../../actions/tappable'
-  import {
-    applyParticleSizes,
-    createResizeObserver,
-  } from '../../utils/page'
-  import {
-    getClones,
-    applyClones,
-  } from '../../utils/clones'
-  import { get, switcher } from '../../utils/object'
-  import createCarousel from './createCarousel'
+  import { onDestroy, onMount, tick, createEventDispatcher } from "svelte";
+  import Dots from "../Dots/Dots.svelte";
+  import Arrow from "../Arrow/Arrow.svelte";
+  import Progress from "../Progress/Progress.svelte";
+  import { NEXT, PREV } from "../../direction";
+  import { swipeable } from "../../actions/swipeable";
+  import { hoverable } from "../../actions/hoverable";
+  import { tappable } from "../../actions/tappable";
+  import { applyParticleSizes, createResizeObserver } from "../../utils/page";
+  import { getClones, applyClones } from "../../utils/clones";
+  import { get, switcher } from "../../utils/object";
+  import createCarousel from "./createCarousel";
 
   // used for lazy loading images, preloaded only current, adjacent and cloanable images
-  let loaded = []
-  let currentPageIndex
+  let loaded = [];
+  let currentPageIndex;
   $: {
-    dispatch('pageChange', currentPageIndex)
+    dispatch("pageChange", currentPageIndex);
   }
 
-  let progressValue
-  let offset = 0
-  let durationMs = 0
-  let pagesCount = 1
+  let progressValue;
+  let offset = 0;
+  let durationMs = 0;
+  let pagesCount = 1;
 
-  const [{ data, progressManager }, methods, service] = createCarousel((key, value) => {
-    switcher({
-      'currentPageIndex': () => currentPageIndex = value,
-      'progressValue': () => progressValue = value,
-      'offset': () => offset = value,
-      'durationMs': () => durationMs = value,
-      'pagesCount': () => pagesCount = value,
-      'loaded': () => loaded = value,
-    })(key)
-  })
+  const [{ data, progressManager }, methods, service] = createCarousel(
+    (key, value) => {
+      switcher({
+        currentPageIndex: () => (currentPageIndex = value),
+        progressValue: () => (progressValue = value),
+        offset: () => (offset = value),
+        durationMs: () => (durationMs = value),
+        pagesCount: () => (pagesCount = value),
+        loaded: () => (loaded = value),
+      })(key);
+    }
+  );
 
-  const dispatch = createEventDispatcher()
+  const dispatch = createEventDispatcher();
 
   /**
    * CSS animation timing function
    * examples: 'linear', 'steps(5, end)', 'cubic-bezier(0.1, -0.6, 0.2, 0)'
    */
-  export let timingFunction = 'ease-in-out';
+  export let timingFunction = "ease-in-out";
 
   /**
    * Enable Next/Prev arrows
    */
-  export let arrows = true
+  export let arrows = true;
 
   /**
    * Infinite looping
    */
-  export let infinite = true
+  export let infinite = true;
   $: {
-    data.infinite = infinite
+    data.infinite = infinite;
   }
 
   /**
    * Page to start on
    */
-  export let initialPageIndex = 0
+  export let initialPageIndex = 0;
 
   /**
    * Transition duration (ms)
    */
-  export let duration = 500
+  export let duration = 500;
   $: {
-    data.durationMsInit = duration
+    data.durationMsInit = duration;
   }
 
   /**
    * Enables autoplay of pages
    */
-  export let autoplay = false
+  export let autoplay = false;
   $: {
-    data.autoplay = autoplay
+    data.autoplay = autoplay;
   }
 
   /**
    * Autoplay change interval (ms)
    */
-  export let autoplayDuration = 3000
+  export let autoplayDuration = 3000;
   $: {
-    data.autoplayDuration = autoplayDuration
+    data.autoplayDuration = autoplayDuration;
   }
 
   /**
    * Autoplay change direction ('next', 'prev')
    */
-  export let autoplayDirection = NEXT
+  export let autoplayDirection = NEXT;
   $: {
-    data.autoplayDirection = autoplayDirection
+    data.autoplayDirection = autoplayDirection;
   }
 
   /**
    * Pause autoplay on focus
    */
-  export let pauseOnFocus = false
+  export let pauseOnFocus = false;
   $: {
-    data.pauseOnFocus = pauseOnFocus
+    data.pauseOnFocus = pauseOnFocus;
   }
 
   /**
    * Show autoplay duration progress indicator
    */
-  export let autoplayProgressVisible = false
+  export let autoplayProgressVisible = false;
 
   /**
    * Current page indicator dots
    */
-  export let dots = true
+  export let dots = true;
 
   /**
    * Enable swiping
    */
-  export let swiping = true
+  export let swiping = true;
 
   /**
    * Number of particles to show
    */
-  export let particlesToShow = 1
+  export let particlesToShow = 1;
   $: {
-    data.particlesToShowInit = particlesToShow
+    data.particlesToShowInit = particlesToShow;
   }
 
   /**
    * Number of particles to scroll
    */
-  export let particlesToScroll = 1
+  export let particlesToScroll = 1;
   $: {
-    data.particlesToScrollInit = particlesToScroll
+    data.particlesToScrollInit = particlesToScroll;
+  }
+
+  /**
+   * Size of gap between particles in px (pixels)
+   */
+  export let gapSize = 0;
+  $: {
+    data.gapSize = gapSize;
   }
 
   export async function goTo(pageIndex, options) {
-    const animated = get(options, 'animated', true)
-    if (typeof pageIndex !== 'number') {
-      throw new Error('pageIndex should be a number')
+    const animated = get(options, "animated", true);
+    if (typeof pageIndex !== "number") {
+      throw new Error("pageIndex should be a number");
     }
-    await methods.showPage(pageIndex, { animated })
+    await methods.showPage(pageIndex, { animated });
   }
 
   export async function goToPrev(options) {
-    const animated = get(options, 'animated', true)
-    await methods.showPrevPage({ animated })
+    const animated = get(options, "animated", true);
+    await methods.showPrevPage({ animated });
   }
 
   export async function goToNext(options) {
-    const animated = get(options, 'animated', true)
-    await methods.showNextPage({ animated })
+    const animated = get(options, "animated", true);
+    await methods.showNextPage({ animated });
   }
 
-  let pageWindowWidth = 0
-  let pageWindowElement
-  let particlesContainer
+  let pageWindowWidth = 0;
+  let pageWindowElement;
+  let particlesContainer;
+  let pageWindowElementResizeObserver;
 
-  const pageWindowElementResizeObserver = createResizeObserver(({
-    width,
-  }) => {
-    pageWindowWidth = width
-    data.particleWidth = pageWindowWidth / data.particlesToShow
+  const pageWindowElementResizeObserverHandler = ({ width }) => {
+    pageWindowWidth = width + data.gapSize;
+    data.particleWidth = pageWindowWidth / data.particlesToShow;
 
     applyParticleSizes({
       particlesContainerChildren: particlesContainer.children,
-      particleWidth: data.particleWidth,
-    })
-    methods.offsetPage({ animated: false })
-  })
+      particleWidth: data.particleWidth - data.gapSize,
+    });
+    methods.offsetPage({ animated: false });
+  };
 
   function addClones() {
-    const {
-      clonesToAppend,
-      clonesToPrepend,
-    } = getClones({
+    const { clonesToAppend, clonesToPrepend } = getClones({
       clonesCountHead: data.clonesCountHead,
       clonesCountTail: data.clonesCountTail,
       particlesContainerChildren: particlesContainer.children,
-    })
+    });
     applyClones({
       particlesContainer,
       clonesToAppend,
       clonesToPrepend,
-    })
+    });
   }
 
   onMount(() => {
     (async () => {
-      await tick()
+      pageWindowElementResizeObserver = createResizeObserver(
+        pageWindowElementResizeObserverHandler
+      );
+      await tick();
       if (particlesContainer && pageWindowElement) {
-        data.particlesCountWithoutClones = particlesContainer.children.length
+        data.particlesCountWithoutClones = particlesContainer.children.length;
 
-        await tick()
-        data.infinite && addClones()
+        await tick();
+        data.infinite && addClones();
 
         // call after adding clones
-        data.particlesCount = particlesContainer.children.length
+        data.particlesCount = particlesContainer.children.length;
 
-        methods.showPage(initialPageIndex, { animated: false })
+        methods.showPage(initialPageIndex, { animated: false });
 
         pageWindowElementResizeObserver.observe(pageWindowElement);
       }
-    })()
-  })
+    })();
+  });
 
   onDestroy(() => {
-    pageWindowElementResizeObserver.disconnect()
-    progressManager.reset()
-  })
+    if (pageWindowElementResizeObserver) {
+      pageWindowElementResizeObserver.disconnect();
+    }
+    progressManager.reset();
+  });
 
   async function handlePageChange(pageIndex) {
-    await methods.showPage(pageIndex, { animated: true })
+    await methods.showPage(pageIndex, { animated: true });
   }
 
   // gestures
   function handleSwipeStart() {
-    if (!swiping) return
-    data.durationMs = 0
+    if (!swiping) return;
+    data.durationMs = 0;
   }
   async function handleSwipeThresholdReached(event) {
-    if (!swiping) return
+    if (!swiping) return;
     await switcher({
       [NEXT]: methods.showNextPage,
-      [PREV]: methods.showPrevPage
-    })(event.detail.direction)
+      [PREV]: methods.showPrevPage,
+    })(event.detail.direction);
   }
   function handleSwipeMove(event) {
-    if (!swiping) return
-    data.offset += event.detail.dx
+    if (!swiping) return;
+    data.offset += event.detail.dx;
   }
   function handleSwipeEnd() {
-    if (!swiping) return
-    methods.showParticle(data.currentParticleIndex)
+    if (!swiping) return;
+    methods.showParticle(data.currentParticleIndex);
   }
   async function handleSwipeFailed() {
-    if (!swiping) return
-    await methods.offsetPage({ animated: true })
+    if (!swiping) return;
+    await methods.offsetPage({ animated: true });
   }
 
   function handleHovered(event) {
-    data.focused = event.detail.value
+    data.focused = event.detail.value;
   }
   function handleTapped() {
-    methods.toggleFocused()
+    methods.toggleFocused();
   }
 
   function showPrevPage() {
-    methods.showPrevPage()
+    methods.showPrevPage();
   }
 </script>
 
 <div class="sc-carousel__carousel-container">
   <div class="sc-carousel__content-container">
     {#if arrows}
-      <slot name="prev" showPrevPage={methods.showPrevPage}>
+      <slot
+        name="prev"
+        showPrevPage={methods.showPrevPage}
+        {pagesCount}
+        {currentPageIndex}
+      >
         <div class="sc-carousel__arrow-container">
           <Arrow
             direction="prev"
@@ -270,22 +280,21 @@
     <div
       class="sc-carousel__pages-window"
       bind:this={pageWindowElement}
-
       use:hoverable
       on:hovered={handleHovered}
-
       use:tappable
       on:tapped={handleTapped}
     >
       <div
         class="sc-carousel__pages-container"
-        use:swipeable="{{ thresholdProvider: () => pageWindowWidth/3 }}"
+        use:swipeable={{ thresholdProvider: () => pageWindowWidth / 3 }}
         on:swipeStart={handleSwipeStart}
         on:swipeMove={handleSwipeMove}
         on:swipeEnd={handleSwipeEnd}
         on:swipeFailed={handleSwipeFailed}
         on:swipeThresholdReached={handleSwipeThresholdReached}
         style="
+          gap: {gapSize}px;
           transform: translateX({offset}px);
           transition-duration: {durationMs}ms;
           transition-timing-function: {timingFunction};
@@ -301,7 +310,12 @@
       {/if}
     </div>
     {#if arrows}
-      <slot name="next" showNextPage={methods.showNextPage}>
+      <slot
+        name="next"
+        showNextPage={methods.showNextPage}
+        {pagesCount}
+        {currentPageIndex}
+      >
         <div class="sc-carousel__arrow-container">
           <Arrow
             direction="next"
@@ -315,14 +329,14 @@
   {#if dots}
     <slot
       name="dots"
-      currentPageIndex={currentPageIndex}
-      pagesCount={pagesCount}
+      {currentPageIndex}
+      {pagesCount}
       showPage={handlePageChange}
     >
       <Dots
-        pagesCount={pagesCount}
-        currentPageIndex={currentPageIndex}
-        on:pageChange={event => handlePageChange(event.detail)}
+        {pagesCount}
+        {currentPageIndex}
+        on:pageChange={(event) => handlePageChange(event.detail)}
       ></Dots>
     </slot>
   {/if}

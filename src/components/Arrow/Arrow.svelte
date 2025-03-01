@@ -1,19 +1,20 @@
 <script>
-  import { NEXT, PREV } from '../../direction'
+  import { NEXT, PREV } from "../../direction";
 
   /**
    * Indicates direction of the arrow ('next', 'prev')
    */
-  export let direction = NEXT
+  export let direction = NEXT;
 
   /**
    * Indicates if button disabled
    */
-  export let disabled = false
+  export let disabled = false;
 </script>
 
 <button
   class="sc-carousel-button sc-carousel-arrow__circle"
+  type="button"
   class:sc-carousel-arrow__circle_disabled={disabled}
   on:click
 >
