@@ -1,6 +1,6 @@
 {
   "name": "svelte-carousel",
-  "version": "1.1",
+  "version": "1.1.1",
   "description": "Svelte carousel",
   "main": "src/main.js",
   "module": "src/main.js",
@@ -14,7 +14,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vadimkorr/svelte-carousel.git"
+    "url": "git+https://github.com/theonaciri/svelte-carousel.git"
   },
   "bugs": {
     "url": "https://github.com/vadimkorr/svelte-carousel/issues"
