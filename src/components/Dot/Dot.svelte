@@ -2,10 +2,11 @@
   /**
    * Indicates if dot is active
    */
-  export let active = false
+  export let active = false;
 </script>
 
 <button
+  type="button"
   class="sc-carousel-button sc-carousel-dot__dot"
   class:sc-carousel-dot__dot_active={active}
   on:click
